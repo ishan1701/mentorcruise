@@ -1,0 +1,17 @@
+[project]
+name = "mentorcruise"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "black>=25.1.0",
+    "click>=8.2.0",
+    "dataclasses>=0.8",
+    "fastavro>=1.11.1",
+    "mypy>=1.15.0",
+    "pydantic>=2.11.4",
+    "pyspark>=3.5.5",
+    "pyyaml>=6.0.2",
+    "ruff>=0.11.10",
+]

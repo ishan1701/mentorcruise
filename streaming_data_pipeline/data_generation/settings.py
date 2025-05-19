@@ -1,0 +1,1 @@
+SERIALIZATION_FORMAT = "avro"

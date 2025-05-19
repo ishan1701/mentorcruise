@@ -1,0 +1,7 @@
+file_writer_config:
+    output_file_dir: "/tmp/mentor_cruise/data_generation"
+
+kafka_config:
+    bootstrap_servers: "localhost:9092"
+    topic: "mentor_cruise_data"
+    group_id: "data_generation_group"
