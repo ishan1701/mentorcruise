@@ -1,0 +1,2 @@
+SERIALIZATION_FORMAT = "avro"
+WRITER_TYPE = "file"

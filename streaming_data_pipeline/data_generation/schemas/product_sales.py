@@ -1,4 +1,4 @@
-schema = {
+product_price_schema = {
     "type": "record",
     "name": "product_sales",
     "fields": [

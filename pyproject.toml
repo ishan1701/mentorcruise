@@ -9,6 +9,7 @@ dependencies = [
     "click>=8.2.0",
     "dataclasses>=0.8",
     "fastavro>=1.11.1",
+    "loguru>=0.7.3",
     "mypy>=1.15.0",
     "pydantic>=2.11.4",
     "pyspark>=3.5.5",

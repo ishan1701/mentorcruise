@@ -1,1 +1,0 @@
-SERIALIZATION_FORMAT = "avro"
