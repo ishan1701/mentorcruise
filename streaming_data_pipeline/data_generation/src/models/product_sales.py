@@ -13,7 +13,7 @@ class ProductSales(BaseModel):
     product_id: str = Field(max_length=10)
     quantity: int = Field(gt=0)
     price: float = Field(gt=0.0)
-    timestamp: datetime = Field(gt=datetime.now())
+    timestamp: datetime
 
     @field_validator("timestamp")
     def validate_timestamp(cls, v):

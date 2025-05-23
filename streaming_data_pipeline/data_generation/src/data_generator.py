@@ -2,7 +2,7 @@ import asyncio
 from abc import ABC, abstractmethod
 from pydantic import BaseModel
 from streaming_data_pipeline.data_generation.src.random_data_generator import data_generator
-from streaming_data_pipeline.data_generation.src.sink.writer import Context
+from streaming_data_pipeline.data_generation.src.sink.writer_factory import Context
 
 
 class DataGenerator(ABC):
@@ -33,7 +33,7 @@ class StreamingDataGenerator(DataGenerator):
             # Convert the dictionary to a Pydantic model instance
             # data.append(model(**record).model_dump())
             writer= writer_context.write_data()
-            writer(data=record, avro_schema=self.avro_schema, file_path="data.json")
+            writer(data=record, avro_schema=self.avro_schema, file_path=kwargs['file_path'])
 
 
 
@@ -47,12 +47,16 @@ class LateArrivingDataGenerator(DataGenerator):
         self.delay_by_day = delay_by_day
         self.delay_by_hour = delay_by_hour
 
-    def generate_data(self, num_records: int, model: BaseModel, **kwargs) :
+    async def generate_data(self, num_records: int, model: type[BaseModel], writer_context: Context, **kwargs):
         """
         Generate data based on the schema.
         """
-        # Example of generating late arriving data
-        pass
+        records = await data_generator(self.model_schema, num_records, sleep_seconds=0, data_delay_by_day=self.delay_by_day, data_delay_by_hour=self.delay_by_hour)
+        for record in records:
+            # Convert the dictionary to a Pydantic model instance
+            # data.append(model(**record).model_dump())
+            writer = writer_context.write_data()
+            writer(data=record, avro_schema=self.avro_schema, file_path=kwargs['file_path'])
 
 
 class DataGeneratorFactory:

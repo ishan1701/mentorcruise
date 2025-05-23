@@ -7,6 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "black>=25.1.0",
     "click>=8.2.0",
+    "confluent-kafka>=2.10.0",
     "dataclasses>=0.8",
     "fastavro>=1.11.1",
     "loguru>=0.7.3",
