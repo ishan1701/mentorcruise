@@ -3,6 +3,7 @@ import asyncio
 from datetime import datetime, timedelta
 from loguru import logger
 
+
 def random_int(min: int, max: int) -> int:
     return random.randint(min, max)
 
@@ -11,7 +12,7 @@ def random_float(min: float, max: float) -> float:
     return round(random.uniform(min, max), 2)
 
 
-def random_datetime(data_delay_by_day,data_delay_by_hour) -> str:
+def random_datetime(data_delay_by_day, data_delay_by_hour) -> str:
 
     if data_delay_by_day > 0:
         return str(datetime.now() - timedelta(days=data_delay_by_day))
@@ -21,7 +22,13 @@ def random_datetime(data_delay_by_day,data_delay_by_hour) -> str:
         return str(datetime.now())
 
 
-async def data_generator(schema: dict, num_records: int, sleep_seconds=0, data_delay_by_day=0,data_delay_by_hour: int = 0) -> list[dict]:
+async def data_generator(
+    schema: dict,
+    num_records: int,
+    sleep_seconds=0,
+    data_delay_by_day=0,
+    data_delay_by_hour: int = 0,
+) -> list[dict]:
     logger.info(f"Generating {num_records} records")
     data = list()
 
@@ -37,7 +44,10 @@ async def data_generator(schema: dict, num_records: int, sleep_seconds=0, data_d
                 record[key] = str(random_int(min=1000, max=1000000))
 
             elif datatype == "datetime":
-                record[key]=random_datetime(data_delay_by_day=data_delay_by_day, data_delay_by_hour=data_delay_by_hour)
+                record[key] = random_datetime(
+                    data_delay_by_day=data_delay_by_day,
+                    data_delay_by_hour=data_delay_by_hour,
+                )
             else:
                 raise ValueError(f"Unknown datatype: {datatype}")
         data.append(record)

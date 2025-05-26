@@ -1,5 +1,9 @@
-from streaming_data_pipeline.data_generation.src.sink.kafka_writer import KafkaWriterFactory
-from streaming_data_pipeline.data_generation.src.sink.file_writer import FileWriterFactory
+from streaming_data_pipeline.data_generation.src.sink.kafka_writer import (
+    KafkaWriterFactory,
+)
+from streaming_data_pipeline.data_generation.src.sink.file_writer import (
+    FileWriterFactory,
+)
 from typing import Callable
 from streaming_data_pipeline.data_generation.src.sink.writer import Writer
 

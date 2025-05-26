@@ -7,5 +7,3 @@ class Writer(ABC):
     @abstractmethod
     def write(self, data: dict | Iterable[dict]) -> None:
         pass
-
-
