@@ -1,11 +1,10 @@
 writer:
     file:
         output_file_dir: "/tmp/mentor_cruise/data_generation"
-        output_file_name: "input_data.jsonl",
+        output_file_name: "input_data.jsonl"
         serialization_format: "ndjson"
 
     kafka:
         bootstrap_servers: "localhost:9092"
         topic: "mentor_cruise"
-        group_id: "data_generation_group",
         serialization_format: "avro"

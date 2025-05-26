@@ -4,7 +4,7 @@ import asyncio
 from streaming_data_pipeline.data_generation.src.sink.writer_factory import WriterFactory
 from streaming_data_pipeline.data_generation.src.sink.writer_factory import Context
 from streaming_data_pipeline.data_generation.src.data_generator import DataGeneratorFactory
-from streaming_data_pipeline.data_generation.src.serializer.serializer_factory import SerializerFactory
+# from streaming_data_pipeline.data_generation.src.serializer.serializer_factory import SerializerFactory
 
 
 

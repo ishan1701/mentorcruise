@@ -4,9 +4,8 @@ from typing import Iterable
 
 class Writer(ABC):
 
-    @staticmethod
     @abstractmethod
-    def write(self, data: dict | Iterable[dict], avro_schema: dict, **kwargs) -> None:
+    def write(self, data: dict | Iterable[dict]) -> None:
         pass
 
 

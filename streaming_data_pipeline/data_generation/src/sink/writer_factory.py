@@ -1,7 +1,7 @@
-from streaming_data_pipeline.data_generation.src.sink.file_writer import FileWriter
-from streaming_data_pipeline.data_generation.src.sink.kafka_writer import KafkaWriter
-from streaming_data_pipeline.data_generation.src.sink.writer import Writer
+from streaming_data_pipeline.data_generation.src.sink.kafka_writer import KafkaWriterFactory
+from streaming_data_pipeline.data_generation.src.sink.file_writer import FileWriterFactory
 from typing import Callable
+from streaming_data_pipeline.data_generation.src.sink.writer import Writer
 
 
 class WriterFactory:
@@ -10,12 +10,12 @@ class WriterFactory:
     """
 
     @staticmethod
-    def get_writer(writer_type: str) -> Writer:
+    def get_writer(writer_type: str, **kwargs) -> Writer:
         if writer_type == "file":
+            return FileWriterFactory.get_writer(**kwargs)
 
-            return FileWriter()
         elif writer_type == "kafka":
-            return KafkaWriter()
+            return KafkaWriterFactory.get_writer(**kwargs)
         else:
             raise ValueError(f"Unknown writer type: {writer_type}")
 
