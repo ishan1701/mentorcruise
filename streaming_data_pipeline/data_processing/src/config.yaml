@@ -1,0 +1,11 @@
+reader:
+  kafka:
+    bootstrap_servers: 'localhost:9092'
+    topic: 'mentor_cruise'
+    group_id: 'data_processing_group'
+    watermark_time_seconds: 300
+    window_size_in_seconds: 60
+
+writer:
+  iceberg:
+

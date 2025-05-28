@@ -34,16 +34,16 @@ class FileWriterFactory(KafkaWriterFactory):
 
 
 # testing
-# if __name__ == '__main__':
-#     from streaming_data_pipeline.data_generation.src.models.product_sales import ProductSales
-#     from datetime import datetime
-#
-#     sample_data = ProductSales(
-#         product_id='eede',
-#         quantity=10,
-#         price=100.0,
-#         timestamp=datetime.now()
-#     )
-#     writer = FileWriterFactory.get_writer(serialization_format='avro', file_path='test')
-#     for _ in range(10):
-#         writer.write(data=sample_data.serialize())
+if __name__ == '__main__':
+    from streaming_data_pipeline.data_generation.src.models.product_sales import ProductSales
+    from datetime import datetime
+
+    sample_data = ProductSales(
+        product_id='eede',
+        quantity=10,
+        price=100.0,
+        timestamp=datetime.now()
+    )
+    writer = FileWriterFactory.get_writer(serialization_format='avro', file_path='test')
+    for _ in range(10):
+        writer.write(data=sample_data.serialize())

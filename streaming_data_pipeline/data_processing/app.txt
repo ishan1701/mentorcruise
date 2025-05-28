@@ -1,0 +1,30 @@
+# This is an version of the app that processes streaming data. Hence it has basic data parsing with processing
+only avro data from kafka topics
+
+1. get the data from kafka topic
+2. parse the avro data based on the schema
+3. what is water marking or windowing in structured streaming ans its use cases
+4. write the df in parquet format to a location.\
+5. create the open table format in iceberg
+
+batch spark app
+1. create a job to perform the below aggregation
+a. daily product sales count
+b. late records counts
+
+
+
+solution:
+1. create a spark structured streaming, which can read the data from kafka
+so I need to define a reader class with Strategy design pattern
+
+2. Now design a parser class that will parse the avro data based on the schema
+Here also use the Strategy design pattern to define different parsers for different schemas.
+like for avro, json or protobuf
+
+3. perform watermarking and windowing in structured streaming.
+Now this will be used based on the config
+
+
+4. create a writer class that will wite the data in open table format
+Here also use the Strategy design pattern to define different writers for different formats like parquet, iceberg, etc.
