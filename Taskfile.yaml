@@ -1,0 +1,29 @@
+version: '3'
+
+vars:
+  WAREHOUSE_DIR: "iceberg/warehouse"
+  SPARK_VERSION: "3.5.5"
+tasks:
+
+  setup:
+    desc: Create local warehouse directory
+    cmds:
+      - mkdir -p {{.WAREHOUSE_DIR}}
+
+  setup-venv:
+    desc: Setup Python virtual environment
+    cmds:
+      - uv venv .venv
+      - source .venv/bin/activate && uv pip install -r pyproject.toml
+
+  setup-kafka:
+    desc: Setup Kafka environment
+    cmds:
+        - docker compose up -d
+
+  start--kafka:
+    desc: Start Kafka service
+    cmds:
+      - docker compose start kafka
+
+

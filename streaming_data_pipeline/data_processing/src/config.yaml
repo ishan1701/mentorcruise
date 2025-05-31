@@ -8,4 +8,8 @@ reader:
 
 writer:
   iceberg:
+    type: 'hadoop'
+    warehouse: '/Users/ishan.kumar/PycharmProjects/mentorcruise/iceberg/warehouse'
+    database: 'mentor_cruise'
+    catalog: 'mentor_cruise'
 

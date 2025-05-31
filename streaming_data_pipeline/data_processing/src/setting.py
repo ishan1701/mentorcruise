@@ -1,3 +1,0 @@
-READER_TYPE = "kafka"
-READER_SERIALIZATION_FORMAT = "json"
-WRITER_TYPE = "console"

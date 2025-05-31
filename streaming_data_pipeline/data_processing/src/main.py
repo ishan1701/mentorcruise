@@ -11,6 +11,7 @@ from pyspark import SparkConf
 from process import process_data
 import os
 from loguru import logger
+from streaming_data_pipeline.model_schema_map import MODEL_MAP
 
 
 def main():
@@ -21,6 +22,8 @@ def main():
     writer_config = config.get("writer")
     logger.info(f"Reader config: {reader_config}")
     logger.info(f"Writer config: {writer_config}")
+    # get the model configuration. This i
+    model_config = MODEL_MAP
 
     # reader context
     reader = ReaderFactory.get_reader(
@@ -41,10 +44,10 @@ def main():
         SparkConf()
         .set("spark.driver.memory", "1g")
         .set("spark.executor.memory", "1g")
-        # .set("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1")
-        .set("spark.sql.streaming.checkpointLocation", "/tmp/spark-checkpoint")
+        .set("spark.sql.catalog.my_catalog.type", "hadoop")
+        .set("spark.sql.catalog.my_catalog.warehouse", "iceberg/warehouse")
+        .set("spark.sql.streaming.checkpointLocation", "spark-checkpoint/checkpoint")
     )
-    # .set("spark.jars.packages", "org.apache.spark:spark-avro_2.12:3.5.1"))
 
     spark = get_spark_session(
         master="local[*]", app_name="mentor_cruise_app", conf=spark_conf

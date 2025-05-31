@@ -6,10 +6,6 @@ from pyspark.sql import DataFrame
 from streaming_data_pipeline.data_processing.schemas.product_sales import product_sales
 
 
-def tesr(df: DataFrame) -> DataFrame:
-    return df
-
-
 def process_data(reader, parser, writer, spark):
     # start reading data
 

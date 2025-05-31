@@ -1,0 +1,5 @@
+catalogs:
+  nessie:
+    type: rest
+    uri: http://localhost:19120/api/v1
+    warehouse: file:///tmp/iceberg-warehouse

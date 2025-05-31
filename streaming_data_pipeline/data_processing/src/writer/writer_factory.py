@@ -1,6 +1,7 @@
 from streaming_data_pipeline.data_processing.src.writer.writer import (
     Writer,
     ConsoleWriter,
+    IcebergWriter,
 )
 from pyspark.sql import DataFrame
 
@@ -10,6 +11,8 @@ class WriterFactory:
     def get_writer(writer_type: str) -> Writer:
         if writer_type == "console":
             return ConsoleWriter()
+        elif writer_type == "iceberg":
+            return IcebergWriter()
         else:
             raise ValueError(f"Unknown writer type: {writer_type}")
 
