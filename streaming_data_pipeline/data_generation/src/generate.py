@@ -9,10 +9,11 @@ from streaming_data_pipeline.data_generation.src.data_generator import (
     DataGeneratorFactory,
 )
 
+
 # from streaming_data_pipeline.data_generation.src.serializer.serializer_factory import SerializerFactory
 
 
-async def generate(**kwargs):
+def generate(**kwargs):
     # Create a writer context based on the writer type
     writer = WriterFactory.get_writer(writer_type=kwargs["writer_type"])
     context = Context(writer=writer)
@@ -24,7 +25,7 @@ async def generate(**kwargs):
 
     # create serialzation context
 
-    await generator.generate_data(
+    generator.generate_data(
         num_records=kwargs["num_of_records"],
         model=kwargs["mode"],
         writer_context=context,

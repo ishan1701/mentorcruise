@@ -12,12 +12,12 @@ def if_iceberg_table_exists(catalog: Catalog, table_name: str, namespace: str) -
     return False
 
 
-def get_iceberg_catalog(iceberg_catalog: str) -> Catalog:
+def get_iceberg_catalog(catalog: str) -> Catalog:
     try:
-        catalog = load_catalog(iceberg_catalog)
+        catalog = load_catalog(catalog)
         return catalog
     except Exception as e:
-        raise ValueError(f"Failed to load Iceberg catalog '{iceberg_catalog}': {e}")
+        raise ValueError(f"Failed to load Iceberg catalog '{catalog}': {e}")
 
 
 def create_namespace(catalog: Catalog, namespace: str):

@@ -8,8 +8,13 @@ reader:
 
 writer:
   iceberg:
-    type: 'hadoop'
-    warehouse: '/Users/ishan.kumar/PycharmProjects/mentorcruise/iceberg/warehouse'
-    database: 'mentor_cruise'
     catalog: 'mentor_cruise'
+    namespace: 'mentor_cruise'
+
+  file:
+    format: 'parquet'
+    path: 'output/'
+    partition_by: 'creation_date'
+
+
 

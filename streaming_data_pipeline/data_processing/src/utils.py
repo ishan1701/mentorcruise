@@ -23,8 +23,9 @@ def get_spark_session(master: str, conf, app_name: str) -> SparkSession:
         .config(
             "spark.jars.packages",
             "org.apache.spark:spark-sql-kafka-0-10_2.13:3.5.1,"
-            "org.apache.spark:spark-avro_2.13:3.5.1"
-            "org.apache.iceberg:iceberg-spark-runtime-3.5.1_2.32:1.9.1",
+            "org.apache.spark:spark-avro_2.13:3.5.1,"
+            "org.apache.iceberg:iceberg-spark-runtime-3.5_2.13:1.9.1"
+            # "org.apache.iceberg:iceberg-spark-runtime-3.5.1_2.32:1.9.1",
         )
         .appName(app_name)
         .master(master)

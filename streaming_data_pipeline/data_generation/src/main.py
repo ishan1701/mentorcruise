@@ -1,7 +1,7 @@
 from streaming_data_pipeline.data_generation.src.generate import generate
 from pathlib import Path
 from streaming_data_pipeline.data_generation.src.utils import load_yaml_file
-from streaming_data_pipeline.data_generation.src.settings import WRITER_TYPE
+from streaming_data_pipeline.settings import WRITER_TYPE
 import asyncio
 
 
@@ -17,4 +17,5 @@ def main():
 
 if __name__ == "__main__":
     # hardcoded for now, but can be extended to take command line arguments via click
+
     main()

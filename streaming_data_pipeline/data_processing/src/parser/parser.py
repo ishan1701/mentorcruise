@@ -1,6 +1,6 @@
 # parser strategy for parsing data from a file
 from pyspark.sql import DataFrame, SparkSession, DataFrame, Column
-import loguru
+from loguru import logger
 
 from abc import ABC, abstractmethod
 
@@ -45,9 +45,9 @@ class AvroParser(Parser):
         }"""
 
         if not schema:
-            loguru.logger.error("Schema is required for Avro parsing")
+            logger.error("Schema is required for Avro parsing")
             raise Exception("Schema is required for Avro parsing")
-        loguru.logger.info(f"Parsing data using AvroParser with schema: {schema}")
+        logger.info(f"Parsing data using AvroParser with schema: {schema}")
         from pyspark.sql.avro.functions import from_avro
 
         parsed_df = df.withColumn(
@@ -69,18 +69,24 @@ class JsonParser(Parser):
         **kwargs,
     ):
         from pyspark.sql.functions import from_json
+        df.printSchema()
+        logger.info(f"Parsing data using JsonParser with column: {column}")
 
-        schema = kwargs.get("schema")
-        if not schema:
-            loguru.logger.error("Schema is required for JSON parsing")
+        spark_schema = kwargs.get("spark_schema")
+        if not spark_schema:
+            logger.error("Schema is required for JSON parsing")
             raise Exception("Schema is required for JSON parsing")
 
-        loguru.logger.info(f"Parsing data using JsonParser with schema: {schema}")
+        logger.info(f"Parsing data using JsonParser with spark_schema: {spark_schema}")
         json_df = df.selectExpr(f"CAST({column} AS STRING) as value")
 
+        json_df.printSchema()
+
         parsed_df_with_column = json_df.withColumn(
-            parsed_column_name, from_json(column, schema)
+            parsed_column_name, from_json('value', spark_schema)
         ).select(f"{parsed_column_name}.*")
+
+        parsed_df_with_column.printSchema()
 
         return parsed_df_with_column
 

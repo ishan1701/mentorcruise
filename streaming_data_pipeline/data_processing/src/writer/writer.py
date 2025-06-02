@@ -23,34 +23,37 @@ class ConsoleWriter(Writer):
 
 class IcebergWriter(Writer):
 
-    # def create_table(self, spark: SparkSession, table_name: str, catalog: str, db_name: str):
-    #     """
-    #     Create Iceberg table if it does not exist.
-    #     """
-    #     loguru.logger.info(f"Creating Iceberg table {table_name} in catalog {catalog} and database {db_name}")
-    #     spark.sql(f"""
-    #         CREATE TABLE IF NOT EXISTS {catalog}.{db_name}.{table_name} (
-    #             id INT,
-    #             name STRING,
-    #             value DOUBLE
-    #         )
-    #         USING iceberg
-    #     """)
-    #     loguru.logger.info(f"Iceberg table {table_name} created successfully")
-
-    def write(self, spark: SparkSession, df: DataFrame, **kwargs):
+    def write(self, df: DataFrame, **kwargs):
         """
         Write DataFrame to Iceberg table.
         """
         catalog = kwargs.get("catalog")
-        db_name = kwargs.get("db")
-        table_name = kwargs.get("table_name")
+        namespace = kwargs.get("namespace")
+        table_name = kwargs.get("iceberg_table")
+        print(df.schema)
 
-        if not table_name or not catalog or not db_name:
+        if not table_name or not catalog or not namespace:
             loguru.logger.error(
                 f"Missing required parameters: table_name, catalog, or db"
             )
             raise ValueError("Missing required parameters: table_name, catalog, or db")
 
         loguru.logger.info(f"Writing DataFrame to Iceberg table: {table_name}")
-        df.writeTo(f"{catalog}.{db_name}.{table_name}").append()
+
+        # df.writeTo("demo.nyc.taxis").create()
+
+        df.writeStream.format('iceberg').outputMode('append').toTable("mentor_cruise.mentor_cruise")
+
+
+class FileWriter(Writer):
+    def write(self, df: DataFrame, **kwargs):
+        """
+        Write DataFrame to a file.
+        """
+        format = kwargs.get("format", "parquet")
+        dir_path = kwargs.get("path")
+        mode = kwargs.get("mode", "append")
+        partition_col = kwargs.get("partition_by")
+
+        query = df.writeStream.format(format).partitionBy(partition_col).outputMode(mode).option("path", dir_path).start()
+        query.awaitTermination()

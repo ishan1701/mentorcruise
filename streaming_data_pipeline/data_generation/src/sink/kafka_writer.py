@@ -1,7 +1,7 @@
 # TO DO. Add the derived class for Kafka writer
 import loguru
 
-from streaming_data_pipeline.data_generation.schemas.product_sales import product_sales
+from streaming_data_pipeline.schemas.product_sales import product_sales_avro_schema
 from streaming_data_pipeline.data_generation.src.sink.writer import Writer
 from typing import Iterable
 from abc import abstractmethod
@@ -102,7 +102,7 @@ if __name__ == '__main__':
         price=100.0,
         timestamp= datetime.now()
     )
-    writer = KafkaWriterFactory.get_writer(serialization_format='json', topic='mentor_cruise', brokers='localhost:9092', schema=product_sales)
+    writer = KafkaWriterFactory.get_writer(serialization_format='json', topic='mentor_cruise', brokers='localhost:9092', schema=product_sales_avro_schema)
     for _ in range(10):
         writer.write(data=sample_data.serialize())
 
