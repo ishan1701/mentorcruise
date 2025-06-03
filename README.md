@@ -15,3 +15,11 @@ Below is the architecture diagram for the project:
 * derialized data from kafka via from_avro/ from_json methods.
 * perform the required transformations on the data if needed.
 * push the transformed data to iceberg table.
+
+
+
+(.venv) ➜  warehouse curl http://localhost:19120/api/v1/config
+{
+  "defaultBranch" : "main",
+  "maxSupportedApiVersion" : 2
+}% 

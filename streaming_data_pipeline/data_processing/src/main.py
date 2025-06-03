@@ -11,6 +11,7 @@ from pyspark import SparkConf
 from process import process_data
 import os
 from loguru import logger
+from streaming_data_pipeline.data_processing.src.helpers.helpers_iceberg import create_table_with_pyspark
 
 
 def main(model):
@@ -36,14 +37,32 @@ def main(model):
     # #writer context
     writer = WriterFactory.get_writer(writer_type=WRITER_TYPE)
     writer_context = WriterContext(writer=writer)
-
-    # master: str, conf, app_name: str
+    NESSIE_SERVER_URI = "http://localhost:19120/api/v2"
+    WAREHOUSE_BUCKET = "/tmp/warehouse"
+    # WAREHOUSE_BUCKET = "s3://warehouse"
+    # MINIO_URI = "http://172.19.0.2:9000"
+    # "org.apache.spark:spark-sql-kafka-0-10_2.13:3.5.1,"
+    #     "org.apache.spark:spark-avro_2.13:3.5.1,"
     spark_conf = (
         SparkConf()
+        .set('spark.jars.packages',
+             'org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.5.2,org.projectnessie.nessie-integrations:nessie-spark-extensions-3.5_2.12:0.91.3,org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.2')
+        # SQL Extensions
+        .set('spark.sql.extensions',
+             'org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions,org.projectnessie.spark.extensions.NessieSparkSessionExtensions')
+        # Configuring Catalog
+        .set('spark.sql.catalog.nessie', 'org.apache.iceberg.spark.SparkCatalog')
+        .set('spark.sql.catalog.nessie.uri', NESSIE_SERVER_URI)
+        .set('spark.sql.catalog.nessie.ref', 'main')
+        .set('spark.sql.catalog.nessie.authentication.type', 'NONE')
+        .set('spark.sql.catalog.nessie.catalog-impl', 'org.apache.iceberg.nessie.NessieCatalog')
+        # .set("spark.sql.catalog.nessie.s3.endpoint",MINIO_URI)
+        .set('spark.sql.catalog.nessie.warehouse', WAREHOUSE_BUCKET)
+        # .set('spark.sql.catalog.nessie.io-impl', 'org.apache.iceberg.aws.s3.S3FileIO')
         .set("spark.driver.memory", "1g")
         .set("spark.executor.memory", "1g")
         .set("spark.sql.streaming.checkpointLocation", "spark-checkpoint/checkpoint")
-        .set("spark.sql.catalog.local","org.apache.iceberg.spark.SparkCatalog")
+        .set("spark.sql.catalog.local", "org.apache.iceberg.spark.SparkCatalog")
         .set("spark.sql.catalog.local.type", "hadoop")
         .set("spark.sql.catalog.local.warehouse", "file:///tmp/warehouse")
     )
@@ -55,22 +74,27 @@ def main(model):
     writer_kwargs = dict()
 
     if WRITER_TYPE == "iceberg":
-        from streaming_data_pipeline.data_processing.src.helpers.helpers_iceberg import create_table_with_pyspark
-
-        catalog = writer_config[WRITER_TYPE]['catalog']
-        namespace = writer_config[WRITER_TYPE]['namespace']
-
-        from helpers.helpers_iceberg import get_iceberg_catalog, create_namespace, create_table
-
-        catalog = get_iceberg_catalog(catalog=catalog)
-        create_namespace(catalog=catalog, namespace=namespace)
-        create_table(catalog=catalog,
-                     namespace=namespace,
-                     table_name=model['iceberg_table'],
-                     schema=model['iceberg_schema'])
-        writer_kwargs['catalog'] = catalog
-        writer_kwargs['namespace'] = namespace
+        writer_kwargs['namespace'] = writer_config[WRITER_TYPE]['namespace']
         writer_kwargs['iceberg_table'] = model['iceberg_table']
+        writer_kwargs['create_sql'] = model['create_sql']
+        create_table_with_pyspark(spark=spark, **writer_kwargs)
+
+        # from streaming_data_pipeline.data_processing.src.helpers.helpers_iceberg import create_table_with_pyspark
+        #
+        # catalog = writer_config[WRITER_TYPE]['catalog']
+        # namespace = writer_config[WRITER_TYPE]['namespace']
+        #
+        # from helpers.helpers_iceberg import get_iceberg_catalog, create_namespace, create_table
+        #
+        # catalog = get_iceberg_catalog(catalog=catalog)
+        # create_namespace(catalog=catalog, namespace=namespace)
+        # create_table(catalog=catalog,
+        #              namespace=namespace,
+        #              table_name=model['iceberg_table'],
+        #              schema=model['iceberg_schema'])
+        # writer_kwargs['catalog'] = catalog
+        # writer_kwargs['namespace'] = namespace
+        # writer_kwargs['iceberg_table'] = model['iceberg_table']
 
     elif WRITER_TYPE == "file":
         format = writer_config[WRITER_TYPE]['format']
@@ -80,9 +104,6 @@ def main(model):
         writer_kwargs['format'] = format
         writer_kwargs['path'] = path
         writer_kwargs['partition_by'] = partition_by
-
-
-
 
     process_data(
         reader=reader_context, parser=parser_context, writer=writer_context, spark=spark,

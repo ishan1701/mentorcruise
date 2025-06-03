@@ -27,23 +27,25 @@ class IcebergWriter(Writer):
         """
         Write DataFrame to Iceberg table.
         """
-        catalog = kwargs.get("catalog")
-        namespace = kwargs.get("namespace")
-        table_name = kwargs.get("iceberg_table")
-        print(df.schema)
+        # catalog = kwargs.get("catalog")
+        # namespace = kwargs.get("namespace")
+        # table_name = kwargs.get("iceberg_table")
+        # print(df.schema)
+        #
+        # if not table_name or not catalog or not namespace:
+        #     loguru.logger.error(
+        #         f"Missing required parameters: table_name, catalog, or db"
+        #     )
+        #     raise ValueError("Missing required parameters: table_name, catalog, or db")
 
-        if not table_name or not catalog or not namespace:
-            loguru.logger.error(
-                f"Missing required parameters: table_name, catalog, or db"
-            )
-            raise ValueError("Missing required parameters: table_name, catalog, or db")
+        # loguru.logger.info(f"Writing DataFrame to Iceberg table: {table_name}")
+        namespace= kwargs['namespace']
+        iceberg_table = kwargs['iceberg_table']
+        processing_time = kwargs.get('processing_time', '10 seconds')
 
-        loguru.logger.info(f"Writing DataFrame to Iceberg table: {table_name}")
 
-        # df.writeTo("demo.nyc.taxis").create()
-
-        df.writeStream.format('iceberg').outputMode('append').toTable("mentor_cruise.mentor_cruise")
-
+        query = df.writeStream.format('iceberg').outputMode('append').option("path", f"{namespace}.{iceberg_table}").trigger(processingTime=f"{processing_time}").start()
+        query.awaitTermination()
 
 class FileWriter(Writer):
     def write(self, df: DataFrame, **kwargs):

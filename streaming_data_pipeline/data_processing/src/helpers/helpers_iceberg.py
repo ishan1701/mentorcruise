@@ -1,3 +1,5 @@
+import sys
+
 from pyiceberg.catalog import load_catalog
 from pyiceberg.catalog import Catalog
 from loguru import logger
@@ -18,6 +20,13 @@ def get_iceberg_catalog(catalog: str) -> Catalog:
         return catalog
     except Exception as e:
         raise ValueError(f"Failed to load Iceberg catalog '{catalog}': {e}")
+
+def list_namespaces(catalog: Catalog):
+    """List all namespaces in the Iceberg catalog."""
+    namespaces = catalog.list_namespaces()
+    for ns in namespaces:
+        logger.info(f"Namespace: {ns[0]}")
+    return namespaces
 
 
 def create_namespace(catalog: Catalog, namespace: str):
@@ -51,16 +60,95 @@ def list_tables(catalog: Catalog, namespace: str):
         logger.info(f"Table: {table}")
 
 
+def create_table_with_pyspark(spark, namespace: str, iceberg_table: str, sql:str):
+
+    full_table_name = f"{namespace}.{iceberg_table}"
+    logger.info(f"Creating table {full_table_name}")
+    spark.sql(f"CREATE TABLE IF NOT EXISTS {full_table_name} {sql}")
+    logger.info(f"Table {full_table_name} created successfully.")
+
+
+#
+# import pyspark
+# from pyspark.sql import SparkSession
+# import os
+#
+# print(pyspark.__version__)
+#
+# os.environ["SPARK_LOCAL_IP"] = "127.0.0.1"
+#
+# ## DEFINE SENSITIVE VARIABLES
+# NESSIE_SERVER_URI = "http://localhost:19120/api/v2"
+# # WAREHOUSE_BUCKET = "s3://warehouse"
+# # MINIO_URI = "http://172.19.0.2:9000"
+#
+# WAREHOUSE_BUCKET = "/tmp/warehouse"  # Local path for testing purposes
+#
+# ## Configurations for Spark Session
+# conf = (
+#     pyspark.SparkConf()
+#         .setAppName('app_name')
+#   		#packages
+#         .set('spark.jars.packages',
+#              'org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.5.2,org.projectnessie.nessie-integrations:nessie-spark-extensions-3.5_2.12:0.91.3')
+#         # SQL Extensions
+#         .set('spark.sql.extensions', 'org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions,org.projectnessie.spark.extensions.NessieSparkSessionExtensions')
+#   		#Configuring Catalog
+#         .set('spark.sql.catalog.nessie', 'org.apache.iceberg.spark.SparkCatalog')
+#         .set('spark.sql.catalog.nessie.uri', NESSIE_SERVER_URI)
+#         .set('spark.sql.catalog.nessie.ref', 'main')
+#         .set('spark.sql.catalog.nessie.authentication.type', 'NONE')
+#         .set('spark.sql.catalog.nessie.catalog-impl', 'org.apache.iceberg.nessie.NessieCatalog')
+#         # .set("spark.sql.catalog.nessie.s3.endpoint",MINIO_URI)
+#         .set('spark.sql.catalog.nessie.warehouse', WAREHOUSE_BUCKET)
+#         # .set('spark.sql.catalog.nessie.io-impl', 'org.apache.iceberg.aws.s3.S3FileIO')
+# )
+#
+# ## Start Spark Session
+# spark = SparkSession.builder.config(conf=conf).getOrCreate()
+# print("Spark Running")
+# print(spark)
+#
+# ## TEST QUERY TO CHECK IT WORKING
+# ### Create TABLE
+# spark.sql("CREATE TABLE nessie.example (name STRING) USING iceberg;").show()
+# ### INSERT INTO TABLE
+# spark.sql("INSERT INTO nessie.example VALUES ('Alex Merced');").show()
+# ### Query Table
+# spark.sql("SELECT * FROM nessie.example;").show()
+
+
+
 # local testing
 # if __name__ == '__main__':
-#     catalog = get_iceberg_catalog("mentor_cruise")
-#     create_namespace(catalog, "mentor")
-#     from pyiceberg.types import IntegerType, StringType
-#     from pyiceberg.schema import Schema, NestedField
-#
-#     schema = Schema(
-#         NestedField(1, "id", IntegerType()),
-#         NestedField(2, "name", StringType())
+#     # catalog = load_catalog(
+#     #     "nessie",
+#     #     **{
+#     #         "uri": "http://localhost:19120/iceberg/v1/",
+#     #         "ref": "main",
+#     #         "authentication.type": "NONE",
+#     #         "warehouse": "file:///tmp/warehouse",  # Local path for testing purposes
+#     #     }
+#     # )
+#     nessie_uri = "http://localhost:19120/iceberg"
+#     catalog = load_catalog(
+#         "rest",
+#         uri=f"{nessie_uri}|local_warehouse",
+#         warehouse="/var/nessie_warehouse_data"
 #     )
-#     create_table(catalog, "mentor",table_name='sample1',schema= schema)
-#     print(if_iceberg_table_exists(catalog, "sample1", namespace="mentor"))
+#
+#     # Verify connection by listing namespaces
+#     namespaces = catalog.list_namespaces()
+#     print("Namespaces:", namespaces)
+
+    # catalog = get_iceberg_catalog("nessie")
+    # create_namespace(catalog, "mentor")
+    # from pyiceberg.types import IntegerType, StringType
+    # from pyiceberg.schema import Schema, NestedField
+    #
+    # schema = Schema(
+    #     NestedField(1, "id", IntegerType()),
+    #     NestedField(2, "name", StringType())
+    # )
+    # create_table(catalog, "mentor",table_name='sample1',schema= schema)
+    # print(if_iceberg_table_exists(catalog, "sample1", namespace="mentor"))
