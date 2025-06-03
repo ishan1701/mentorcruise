@@ -36,11 +36,12 @@ product_sales_schema_spark = pyspark_types.StructType(
 )
 
 product_sales_create_sql_iceberg_table = """
-                           CREATE TABLE IF NOT EXISTS product_sales
+                           CREATE TABLE IF NOT EXISTS {namespace}.product_sales
                            (
                                product_id STRING,
                                quantity INT,
-                               price FLOAT,
-                               `timestamp` STRING
+                               price double,
+                               `timestamp` STRING,
+                               creation_date date
                            ) USING iceberg \
                            """.strip()

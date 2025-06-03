@@ -9,7 +9,9 @@ reader:
 writer:
   iceberg:
     catalog: 'mentor_cruise'
-    namespace: 'mentor_cruise'
+    namespace: 'nessie'
+    nessie_server_uri : "http://localhost:19120/api/v2"
+    warehouse_bucket : "/tmp/warehouse"
 
   file:
     format: 'parquet'

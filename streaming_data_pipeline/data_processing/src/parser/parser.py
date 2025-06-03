@@ -69,6 +69,7 @@ class JsonParser(Parser):
         **kwargs,
     ):
         from pyspark.sql.functions import from_json
+
         df.printSchema()
         logger.info(f"Parsing data using JsonParser with column: {column}")
 
@@ -83,7 +84,7 @@ class JsonParser(Parser):
         json_df.printSchema()
 
         parsed_df_with_column = json_df.withColumn(
-            parsed_column_name, from_json('value', spark_schema)
+            parsed_column_name, from_json("value", spark_schema)
         ).select(f"{parsed_column_name}.*")
 
         parsed_df_with_column.printSchema()

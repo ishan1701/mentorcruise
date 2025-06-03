@@ -1,5 +1,3 @@
-import sys
-
 from pyiceberg.catalog import load_catalog
 from pyiceberg.catalog import Catalog
 from loguru import logger
@@ -20,6 +18,7 @@ def get_iceberg_catalog(catalog: str) -> Catalog:
         return catalog
     except Exception as e:
         raise ValueError(f"Failed to load Iceberg catalog '{catalog}': {e}")
+
 
 def list_namespaces(catalog: Catalog):
     """List all namespaces in the Iceberg catalog."""
@@ -60,12 +59,13 @@ def list_tables(catalog: Catalog, namespace: str):
         logger.info(f"Table: {table}")
 
 
-def create_table_with_pyspark(spark, namespace: str, iceberg_table: str, sql:str):
+def create_table_with_pyspark(
+    spark, namespace: str, iceberg_table: str, create_sql: str
+):
 
-    full_table_name = f"{namespace}.{iceberg_table}"
-    logger.info(f"Creating table {full_table_name}")
-    spark.sql(f"CREATE TABLE IF NOT EXISTS {full_table_name} {sql}")
-    logger.info(f"Table {full_table_name} created successfully.")
+    logger.info(f"executing  {create_sql.format(namespace=namespace)}")
+    spark.sql(f"{create_sql.format(namespace=namespace)}")
+    spark.sql(f"describe table formatted {namespace}.{iceberg_table}").show()
 
 
 #
@@ -111,12 +111,13 @@ def create_table_with_pyspark(spark, namespace: str, iceberg_table: str, sql:str
 #
 # ## TEST QUERY TO CHECK IT WORKING
 # ### Create TABLE
-# spark.sql("CREATE TABLE nessie.example (name STRING) USING iceberg;").show()
-# ### INSERT INTO TABLE
-# spark.sql("INSERT INTO nessie.example VALUES ('Alex Merced');").show()
+# # spark.sql("CREATE TABLE nessie.example (name STRING) USING iceberg;").show()
+# # ### INSERT INTO TABLE
+# spark.sql("INSERT INTO nessie.example VALUES ('Addd');").show()
 # ### Query Table
+# spark.sql("describe table formatted nessie.example;").show()
+#
 # spark.sql("SELECT * FROM nessie.example;").show()
-
 
 
 # local testing
@@ -141,14 +142,14 @@ def create_table_with_pyspark(spark, namespace: str, iceberg_table: str, sql:str
 #     namespaces = catalog.list_namespaces()
 #     print("Namespaces:", namespaces)
 
-    # catalog = get_iceberg_catalog("nessie")
-    # create_namespace(catalog, "mentor")
-    # from pyiceberg.types import IntegerType, StringType
-    # from pyiceberg.schema import Schema, NestedField
-    #
-    # schema = Schema(
-    #     NestedField(1, "id", IntegerType()),
-    #     NestedField(2, "name", StringType())
-    # )
-    # create_table(catalog, "mentor",table_name='sample1',schema= schema)
-    # print(if_iceberg_table_exists(catalog, "sample1", namespace="mentor"))
+# catalog = get_iceberg_catalog("nessie")
+# create_namespace(catalog, "mentor")
+# from pyiceberg.types import IntegerType, StringType
+# from pyiceberg.schema import Schema, NestedField
+#
+# schema = Schema(
+#     NestedField(1, "id", IntegerType()),
+#     NestedField(2, "name", StringType())
+# )
+# create_table(catalog, "mentor",table_name='sample1',schema= schema)
+# print(if_iceberg_table_exists(catalog, "sample1", namespace="mentor"))

@@ -2,7 +2,7 @@ from streaming_data_pipeline.data_processing.src.writer.writer import (
     Writer,
     ConsoleWriter,
     IcebergWriter,
-    FileWriter
+    FileWriter,
 )
 from pyspark.sql import DataFrame
 

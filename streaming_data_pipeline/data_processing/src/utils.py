@@ -14,19 +14,6 @@ def load_yaml_file(file_path: Path) -> dict:
         return yaml.safe_load(file)
 
 
-def get_spark_session(master: str, conf, app_name: str) -> SparkSession:
-    """
-    Create and return the spark session object
-    """
-    return (
-        SparkSession.builder.config(conf=conf)
-        .appName(app_name)
-        .master(master)
-        .getOrCreate()
-    )
-
-
-
 def repartition_spark_dataframe(
     dataframe: DataFrame, num_partitions: int, partition_columns: list | None = None
 ) -> DataFrame:

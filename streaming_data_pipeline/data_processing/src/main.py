@@ -3,15 +3,22 @@
 from parser.parser_factory import ParserFactory, ParserContext
 from reader.reader_factory import ReaderFactory, ReaderContext
 from writer.writer_factory import WriterFactory, WriterContext
-from streaming_data_pipeline.settings import READER_TYPE, READER_SERIALIZATION_FORMAT, WRITER_TYPE
+from streaming_data_pipeline.settings import (
+    READER_TYPE,
+    READER_SERIALIZATION_FORMAT,
+    WRITER_TYPE,
+)
 from utils import load_yaml_file
 from pathlib import Path
-from utils import get_spark_session
+from streaming_data_pipeline.utils import get_spark_session
 from pyspark import SparkConf
 from process import process_data
 import os
 from loguru import logger
-from streaming_data_pipeline.data_processing.src.helpers.helpers_iceberg import create_table_with_pyspark
+from streaming_data_pipeline.data_processing.src.helpers.helpers_iceberg import (
+    create_table_with_pyspark,
+)
+from streaming_data_pipeline.utils import get_spark_conf
 
 
 def main(model):
@@ -37,46 +44,23 @@ def main(model):
     # #writer context
     writer = WriterFactory.get_writer(writer_type=WRITER_TYPE)
     writer_context = WriterContext(writer=writer)
-    NESSIE_SERVER_URI = "http://localhost:19120/api/v2"
-    WAREHOUSE_BUCKET = "/tmp/warehouse"
-    # WAREHOUSE_BUCKET = "s3://warehouse"
-    # MINIO_URI = "http://172.19.0.2:9000"
-    # "org.apache.spark:spark-sql-kafka-0-10_2.13:3.5.1,"
-    #     "org.apache.spark:spark-avro_2.13:3.5.1,"
-    spark_conf = (
-        SparkConf()
-        .set('spark.jars.packages',
-             'org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.5.2,org.projectnessie.nessie-integrations:nessie-spark-extensions-3.5_2.12:0.91.3,org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.2')
-        # SQL Extensions
-        .set('spark.sql.extensions',
-             'org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions,org.projectnessie.spark.extensions.NessieSparkSessionExtensions')
-        # Configuring Catalog
-        .set('spark.sql.catalog.nessie', 'org.apache.iceberg.spark.SparkCatalog')
-        .set('spark.sql.catalog.nessie.uri', NESSIE_SERVER_URI)
-        .set('spark.sql.catalog.nessie.ref', 'main')
-        .set('spark.sql.catalog.nessie.authentication.type', 'NONE')
-        .set('spark.sql.catalog.nessie.catalog-impl', 'org.apache.iceberg.nessie.NessieCatalog')
-        # .set("spark.sql.catalog.nessie.s3.endpoint",MINIO_URI)
-        .set('spark.sql.catalog.nessie.warehouse', WAREHOUSE_BUCKET)
-        # .set('spark.sql.catalog.nessie.io-impl', 'org.apache.iceberg.aws.s3.S3FileIO')
-        .set("spark.driver.memory", "1g")
-        .set("spark.executor.memory", "1g")
-        .set("spark.sql.streaming.checkpointLocation", "spark-checkpoint/checkpoint")
-        .set("spark.sql.catalog.local", "org.apache.iceberg.spark.SparkCatalog")
-        .set("spark.sql.catalog.local.type", "hadoop")
-        .set("spark.sql.catalog.local.warehouse", "file:///tmp/warehouse")
-    )
+    nessie_server_uri = writer_config[WRITER_TYPE]["nessie_server_uri"]
+    warehouse_bucket = writer_config[WRITER_TYPE]["warehouse_bucket"]
 
     spark = get_spark_session(
-        master="local[*]", app_name="mentor_cruise_app", conf=spark_conf
+        master="local[*]",
+        app_name="mentor_cruise_app",
+        conf=get_spark_conf(
+            nessie_server_uri=nessie_server_uri, warehouse_bucket=warehouse_bucket
+        ),
     )
 
     writer_kwargs = dict()
 
     if WRITER_TYPE == "iceberg":
-        writer_kwargs['namespace'] = writer_config[WRITER_TYPE]['namespace']
-        writer_kwargs['iceberg_table'] = model['iceberg_table']
-        writer_kwargs['create_sql'] = model['create_sql']
+        writer_kwargs["namespace"] = writer_config[WRITER_TYPE]["namespace"]
+        writer_kwargs["iceberg_table"] = model["iceberg_table"]
+        writer_kwargs["create_sql"] = model["create_sql"]
         create_table_with_pyspark(spark=spark, **writer_kwargs)
 
         # from streaming_data_pipeline.data_processing.src.helpers.helpers_iceberg import create_table_with_pyspark
@@ -97,18 +81,21 @@ def main(model):
         # writer_kwargs['iceberg_table'] = model['iceberg_table']
 
     elif WRITER_TYPE == "file":
-        format = writer_config[WRITER_TYPE]['format']
-        path = writer_config[WRITER_TYPE]['path']
-        partition_by = writer_config[WRITER_TYPE]['partition_by']
+        format = writer_config[WRITER_TYPE]["format"]
+        path = writer_config[WRITER_TYPE]["path"]
+        partition_by = writer_config[WRITER_TYPE]["partition_by"]
 
-        writer_kwargs['format'] = format
-        writer_kwargs['path'] = path
-        writer_kwargs['partition_by'] = partition_by
+        writer_kwargs["format"] = format
+        writer_kwargs["path"] = path
+        writer_kwargs["partition_by"] = partition_by
 
     process_data(
-        reader=reader_context, parser=parser_context, writer=writer_context, spark=spark,
-        spark_schema=model['spark_schema'],
-        **writer_kwargs
+        reader=reader_context,
+        parser=parser_context,
+        writer=writer_context,
+        spark=spark,
+        spark_schema=model["spark_schema"],
+        **writer_kwargs,
     )
 
 

@@ -93,16 +93,20 @@ class KafkaWriterFactory:
 
 # testing
 #
-if __name__ == '__main__':
-    from streaming_data_pipeline.data_generation.src.models.product_sales import ProductSales
-    from datetime import datetime
-    sample_data = ProductSales(
-        product_id='eede',
-        quantity=10,
-        price=100.0,
-        timestamp= datetime.now()
+if __name__ == "__main__":
+    from streaming_data_pipeline.data_generation.src.models.product_sales import (
+        ProductSales,
     )
-    writer = KafkaWriterFactory.get_writer(serialization_format='json', topic='mentor_cruise', brokers='localhost:9092', schema=product_sales_avro_schema)
+    from datetime import datetime
+
+    sample_data = ProductSales(
+        product_id="eede", quantity=10, price=100.0, timestamp=datetime.now()
+    )
+    writer = KafkaWriterFactory.get_writer(
+        serialization_format="json",
+        topic="mentor_cruise",
+        brokers="localhost:9092",
+        schema=product_sales_avro_schema,
+    )
     for _ in range(10):
         writer.write(data=sample_data.serialize())
-

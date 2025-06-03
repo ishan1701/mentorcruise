@@ -5,3 +5,6 @@ __pycache__/
 
 output/
 spark-checkpoint/
+
+derby.log
+metastore_db/
