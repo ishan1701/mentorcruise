@@ -24,9 +24,10 @@ class ProductSales(BaseModel):
     @model_serializer
     def serialize(self):
         """This method should be deprecated in future versions.
-           model_dump() is a built-in method of Pydantic v2 models and works out of the box.
-           You only need to use @model_serializer if you want to customize how your model is serialized
-           (for example, to change the output format or add custom logic). For standard serialization to a dictionary, model_dump() is sufficient"""
+        model_dump() is a built-in method of Pydantic v2 models and works out of the box.
+        You only need to use @model_serializer if you want to customize how your model is serialized
+        (for example, to change the output format or add custom logic). For standard serialization to a dictionary, model_dump() is sufficient
+        """
 
         logger.info("Serializing ProductSales object")
         return {

@@ -20,5 +20,4 @@ def process_data(reader, parser, writer, spark, **kwargs):
 
     transformed_df.printSchema()
 
-
     writer.write(df=transformed_df, **kwargs)

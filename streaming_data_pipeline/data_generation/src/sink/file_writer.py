@@ -25,7 +25,7 @@ class FileWriter(Writer):
 
 class FileWriterFactory(KafkaWriterFactory):
     @staticmethod
-    def get_writer(serialization_format: str='json', **kwargs) -> FileWriter:
+    def get_writer(serialization_format: str = "json", **kwargs) -> FileWriter:
         if serialization_format != "json":
             loguru.logger.warning(
                 "Unsupported serialization format for file writer: {serialization_format}. Defaulting to JSON."
