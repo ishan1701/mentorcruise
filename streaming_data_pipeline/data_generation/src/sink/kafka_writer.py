@@ -30,7 +30,8 @@ class KafkaAvroWriter(KafkaWriter):
         # lets define the pydantic models or better to use assert
         self.schema = kwargs["schema"]
         super().__init__(
-            kafka_topic=kwargs["topic"], kafka_bootstrap_servers=kwargs["bootstrap_servers"]
+            kafka_topic=kwargs["topic"],
+            kafka_bootstrap_servers=kwargs["bootstrap_servers"],
         )
 
     def _serialize(self, data: dict) -> bytes:
@@ -58,7 +59,8 @@ class KafkaJsonWriter(KafkaWriter):
     def __init__(self, **kwargs):
         # lets define the pydantic models
         super().__init__(
-            kafka_topic=kwargs["topic"], kafka_bootstrap_servers=kwargs["bootstrap_servers"]
+            kafka_topic=kwargs["topic"],
+            kafka_bootstrap_servers=kwargs["bootstrap_servers"],
         )
 
     def write(self, data: dict | Iterable[dict]) -> None:
@@ -75,7 +77,7 @@ class KafkaJsonWriter(KafkaWriter):
 
 class KafkaWriterFactory:
     @staticmethod
-    def get_writer(serialization_format='json', **kwargs) -> KafkaWriter:
+    def get_writer(serialization_format="json", **kwargs) -> KafkaWriter:
         loguru.logger.info(
             f"Creating Kafka writer with serialization format: {serialization_format}"
         )

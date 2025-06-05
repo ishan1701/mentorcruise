@@ -22,6 +22,7 @@ def get_daily_product_sales_totals(spark, iceberg_table):
         "select count(1), creation_date from product_sales group by creation_date"
     ).show()
 
+
 def get_late_arriving_records(spark, iceberg_table):
     pass
 

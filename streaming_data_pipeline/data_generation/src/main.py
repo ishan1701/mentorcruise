@@ -1,14 +1,26 @@
 from pathlib import Path
 from streaming_data_pipeline.data_generation.src.utils import load_yaml_file
-from streaming_data_pipeline.settings import DATA_GENERATOR_WRITER as WRITER_TYPE, DATA_GENERATION_MODEL, \
-    DATA_GENERATOR_TYPE
+from streaming_data_pipeline.settings import (
+    DATA_GENERATOR_WRITER as WRITER_TYPE,
+    DATA_GENERATION_MODEL,
+    DATA_GENERATOR_TYPE,
+)
 import asyncio
-from streaming_data_pipeline.settings import DATA_GENERATION_MODEL, DATA_GENERATOR_TYPE, \
-    MODEL_MAP, DATA_GENERATOR_WRITER
+from streaming_data_pipeline.settings import (
+    DATA_GENERATION_MODEL,
+    DATA_GENERATOR_TYPE,
+    MODEL_MAP,
+    DATA_GENERATOR_WRITER,
+)
 
-from streaming_data_pipeline.data_generation.src.data_generator import DataGeneratorFactory, stream_data_generator, \
-    late_data_generator_by_hour, late_data_generator_by_seconds, late_data_generator_by_minutes, \
-    late_data_generator_by_day
+from streaming_data_pipeline.data_generation.src.data_generator import (
+    DataGeneratorFactory,
+    stream_data_generator,
+    late_data_generator_by_hour,
+    late_data_generator_by_seconds,
+    late_data_generator_by_minutes,
+    late_data_generator_by_day,
+)
 import random
 from streaming_data_pipeline.data_generation.src.sink.writer_factory import (
     WriterFactory,
@@ -26,18 +38,23 @@ def main():
     except KeyError:
         raise ValueError(f"some config for {WRITER_TYPE} not found in config.yaml")
 
-    generator = DataGeneratorFactory.data_generator(DATA_GENERATOR_TYPE,
-                                                    data_model=MODEL_MAP[DATA_GENERATION_MODEL]['model'])
+    generator = DataGeneratorFactory.data_generator(
+        DATA_GENERATOR_TYPE, data_model=MODEL_MAP[DATA_GENERATION_MODEL]["model"]
+    )
 
-    functions = [stream_data_generator,
-                 late_data_generator_by_day,
-                 late_data_generator_by_hour,
-                 late_data_generator_by_minutes,
-                 late_data_generator_by_seconds]
+    functions = [
+        stream_data_generator,
+        late_data_generator_by_day,
+        late_data_generator_by_hour,
+        late_data_generator_by_minutes,
+        late_data_generator_by_seconds,
+    ]
 
     # create a sink context
 
-    writer = WriterFactory.get_writer(writer_type=DATA_GENERATOR_WRITER, **writer_config)
+    writer = WriterFactory.get_writer(
+        writer_type=DATA_GENERATOR_WRITER, **writer_config
+    )
     context = Context(writer=writer)
 
     for _ in range(10):

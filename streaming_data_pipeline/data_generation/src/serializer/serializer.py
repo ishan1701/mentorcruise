@@ -26,6 +26,7 @@ class AvroSerializer(Serializer):
         print(avro_bytes)
         return avro_bytes
 
+
 #
 # if __name__ == '__main__':
 #     # Example usage
@@ -44,5 +45,3 @@ class AvroSerializer(Serializer):
 #
 #     with open("test.avro", "a+") as f:
 #         json.dump(data, f)
-
-

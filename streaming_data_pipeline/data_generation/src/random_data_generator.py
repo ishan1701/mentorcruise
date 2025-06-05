@@ -12,9 +12,11 @@ def random_float(min: float, max: float) -> float:
     return round(random.uniform(min, max), 2)
 
 
-def random_datetime(data_delay_by_day, data_delay_by_hour, data_delay_by_mins, data_delay_by_secs) -> str:
+def random_datetime(
+    data_delay_by_day, data_delay_by_hour, data_delay_by_mins, data_delay_by_secs
+) -> str:
 
-    if data_delay_by_secs > 0 :
+    if data_delay_by_secs > 0:
         return str(datetime.now() - timedelta(seconds=data_delay_by_secs))
     if data_delay_by_mins > 0:
         return str(datetime.now() - timedelta(minutes=data_delay_by_mins))
@@ -27,14 +29,13 @@ def random_datetime(data_delay_by_day, data_delay_by_hour, data_delay_by_mins, d
 
 
 async def random_data_generator(
-        schema: dict,
-        num_records: int,
-        sleep_seconds=0,
-        data_delay_by_day=0,
-        data_delay_by_hour: int = 0,
-        data_delay_by_mins: int = 0,
-        data_delay_by_secs: int = 0,
-
+    schema: dict,
+    num_records: int,
+    sleep_seconds=0,
+    data_delay_by_day=0,
+    data_delay_by_hour: int = 0,
+    data_delay_by_mins: int = 0,
+    data_delay_by_secs: int = 0,
 ) -> list[dict]:
     logger.info(f"Generating {num_records} records from random data generator module")
     data = list()
@@ -53,7 +54,7 @@ async def random_data_generator(
                 record[key] = random_datetime(
                     data_delay_by_day=data_delay_by_day,
                     data_delay_by_hour=data_delay_by_hour,
-                    data_delay_by_mins =data_delay_by_mins,
+                    data_delay_by_mins=data_delay_by_mins,
                     data_delay_by_secs=data_delay_by_secs,
                 )
             else:

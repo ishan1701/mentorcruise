@@ -8,8 +8,9 @@ dependencies = [
     "black>=25.1.0",
     "click>=8.2.0",
     "confluent-kafka>=2.10.0",
-    "dataclasses>=0.8",
+#    "dataclasses>=0.8",
     "fastavro>=1.11.1",
+    "hatchling",
     "loguru>=0.7.3",
     "mypy>=1.15.0",
     "pyarrow>=20.0.0",
@@ -19,3 +20,12 @@ dependencies = [
     "pyyaml>=6.0.2",
     "ruff>=0.11.10",
 ]
+
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+packages = ["streaming_data_pipeline", "batch_data_pipeline"]
+

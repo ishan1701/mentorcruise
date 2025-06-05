@@ -20,9 +20,9 @@ class DataGenerator(ABC):
 
     @abstractmethod
     async def generate_data(
-            self,
-            num_records: int,
-            **kwargs,
+        self,
+        num_records: int,
+        **kwargs,
     ) -> list[BaseModel]:
         pass
 
@@ -33,12 +33,15 @@ class StreamingDataGenerator(DataGenerator):
     """
 
     async def generate_data(
-            self,
-            num_records: int,
-            **kwargs,
+        self,
+        num_records: int,
+        **kwargs,
     ) -> list[BaseModel]:
-        records = await random_data_generator(self.data_model.model_schema(), num_records,
-                                              sleep_seconds=kwargs.get("sleep_seconds", 0))
+        records = await random_data_generator(
+            self.data_model.model_schema(),
+            num_records,
+            sleep_seconds=kwargs.get("sleep_seconds", 0),
+        )
 
         for record in records:
             # Convert the dictionary to a Pydantic model instance
@@ -52,15 +55,15 @@ class LateArrivingDataGenerator(DataGenerator):
     """
 
     def __init__(
-            self,
-            data_model: type[BaseModel],
+        self,
+        data_model: type[BaseModel],
     ):
         super().__init__(data_model=data_model)
 
     async def generate_data(
-            self,
-            num_records: int,
-            **kwargs,
+        self,
+        num_records: int,
+        **kwargs,
     ) -> list[BaseModel]:
         records = await random_data_generator(
             self.data_model.model_schema(),
@@ -85,16 +88,14 @@ class DataGeneratorFactory:
 
     @staticmethod
     def data_generator(
-            generator_type: str, data_model: type[BaseModel],
+        generator_type: str,
+        data_model: type[BaseModel],
     ) -> DataGenerator:
         if generator_type == "streaming":
-            return StreamingDataGenerator(
-                data_model=data_model
-            )
+            return StreamingDataGenerator(data_model=data_model)
         elif generator_type == "late_arriving":
             return LateArrivingDataGenerator(
                 data_model=data_model,
-
             )
         else:
             raise ValueError(f"Unknown generator type: {generator_type}")
@@ -105,35 +106,53 @@ from random import randint
 
 async def stream_data_generator(generator):
     print(f"Pushing  data generation event loop of stream_data_generator")
-    data: list[BaseModel] = await generator.generate_data(num_records=randint(1, 200), sleep_seconds=randint(1, 10))
+    data: list[BaseModel] = await generator.generate_data(
+        num_records=randint(1, 200), sleep_seconds=randint(1, 10)
+    )
     return data
 
 
 async def late_data_generator_by_day(generator):
     print(f"Pushing  of data generation event loop of main_late_data_generator_by_day")
-    data: list[BaseModel] = await generator.generate_data(num_records=randint(1, 200), sleep_seconds=randint(1, 10),
-                                                          data_delay_by_day=randint(1, 2))
+    data: list[BaseModel] = await generator.generate_data(
+        num_records=randint(1, 200),
+        sleep_seconds=randint(1, 10),
+        data_delay_by_day=randint(1, 2),
+    )
     return data
 
 
 async def late_data_generator_by_hour(generator):
     print(f"Pushing  of data generation event loop of main_late_data_generator_by_hour")
-    data: list[BaseModel] = await generator.generate_data(num_records=randint(1, 200), sleep_seconds=randint(1, 10),
-                                                          data_delay_by_hour=randint(1, 5))
+    data: list[BaseModel] = await generator.generate_data(
+        num_records=randint(1, 200),
+        sleep_seconds=randint(1, 10),
+        data_delay_by_hour=randint(1, 5),
+    )
     return data
 
 
 async def late_data_generator_by_minutes(generator):
-    print(f"Pushing of data generation event loop of main_late_data_generator_by_minutes")
-    data: list[BaseModel] = await generator.generate_data(num_records=randint(1, 200), sleep_seconds=randint(1, 10),
-                                                          data_delay_by_mins=randint(1, 1000))
+    print(
+        f"Pushing of data generation event loop of main_late_data_generator_by_minutes"
+    )
+    data: list[BaseModel] = await generator.generate_data(
+        num_records=randint(1, 200),
+        sleep_seconds=randint(1, 10),
+        data_delay_by_mins=randint(1, 1000),
+    )
     return data
 
 
 async def late_data_generator_by_seconds(generator):
-    print(f"Pushing of data generation event loop of main_late_data_generator_by_seconds")
-    data: list[BaseModel] = await generator.generate_data(num_records=randint(1, 200), sleep_seconds=randint(1, 10),
-                                                          data_delay_by_secs=randint(1, 4555))
+    print(
+        f"Pushing of data generation event loop of main_late_data_generator_by_seconds"
+    )
+    data: list[BaseModel] = await generator.generate_data(
+        num_records=randint(1, 200),
+        sleep_seconds=randint(1, 10),
+        data_delay_by_secs=randint(1, 4555),
+    )
     return data
 
 

@@ -2,8 +2,6 @@ from pyspark import SparkConf
 from pyspark.sql import SparkSession
 
 
-
-
 def get_spark_conf(**kwargs) -> SparkConf:
     nessie_server_uri = kwargs["nessie_server_uri"]
     warehouse_bucket = kwargs["warehouse_bucket"]

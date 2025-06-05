@@ -1,18 +1,26 @@
 # create a context for parser
 # create a context for writer
-from parser.parser_factory import ParserFactory, ParserContext
-from reader.reader_factory import ReaderFactory, ReaderContext
-from writer.writer_factory import WriterFactory, WriterContext
+from streaming_data_pipeline.data_processing.src.parser.parser_factory import (
+    ParserFactory,
+    ParserContext,
+)
+from streaming_data_pipeline.data_processing.src.reader.reader_factory import (
+    ReaderFactory,
+    ReaderContext,
+)
+from streaming_data_pipeline.data_processing.src.writer.writer_factory import (
+    WriterFactory,
+    WriterContext,
+)
 from streaming_data_pipeline.settings import (
     READER_TYPE,
     READER_SERIALIZATION_FORMAT,
     WRITER_TYPE,
 )
-from utils import load_yaml_file
+from streaming_data_pipeline.data_processing.src.utils import load_yaml_file
 from pathlib import Path
 from streaming_data_pipeline.utils import get_spark_session
-from pyspark import SparkConf
-from process import process_data
+from streaming_data_pipeline.data_processing.src.process import process_data
 import os
 from loguru import logger
 from streaming_data_pipeline.data_processing.src.helpers.helpers_iceberg import (
