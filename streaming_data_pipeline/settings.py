@@ -8,11 +8,15 @@ from streaming_data_pipeline.schemas.product_sales import (
     product_sales_create_sql_iceberg_table,
 )
 
+DATA_GENERATION_MODEL = "product_sales"
 
+#data generation settings
 DATA_GENERATOR_WRITER = "kafka"
-DATA_GENERATOR_TYPE = "streaming"
+DATA_GENERATOR_TYPE = "late_arriving"
 NUM_OF_RECORDS = 1000  # number of records to be generated
 
+
+#data processing settings
 READER_TYPE = "kafka"
 READER_SERIALIZATION_FORMAT = "json"
 WRITER_TYPE = "iceberg"
@@ -29,4 +33,4 @@ MODEL_MAP = {
     }
 }
 
-DATA_GENERATION_MODEL = "product_sales"
+

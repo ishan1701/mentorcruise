@@ -7,4 +7,4 @@ writer:
     kafka:
         bootstrap_servers: "localhost:9092"
         topic: "mentor_cruise"
-        serialization_format: "avro"
+        serialization_format: "json"

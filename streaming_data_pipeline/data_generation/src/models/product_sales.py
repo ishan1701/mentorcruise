@@ -23,6 +23,11 @@ class ProductSales(BaseModel):
 
     @model_serializer
     def serialize(self):
+        """This method should be deprecated in future versions.
+           model_dump() is a built-in method of Pydantic v2 models and works out of the box.
+           You only need to use @model_serializer if you want to customize how your model is serialized
+           (for example, to change the output format or add custom logic). For standard serialization to a dictionary, model_dump() is sufficient"""
+
         logger.info("Serializing ProductSales object")
         return {
             "product_id": self.product_id,
@@ -32,22 +37,22 @@ class ProductSales(BaseModel):
         }
 
     @classmethod
-    def schema(cls):
+    def model_schema(cls):
         """
         Returns the schema of the model.
         """
         schema: dict[str, Any] = {
             name: field.annotation.__name__ for name, field in cls.model_fields.items()
         }
-        logger.info(f"Schema: {schema}")
+        logger.info(f"The model schema is : {schema}")
         return schema
 
 
 # local testing
-# if __name__ == "__main__":
-#     p_sales = ProductSales(
-#         product_id="23", quantity=5, price=5.0, timestamp=datetime.now()
-#     )
-#
-#     print(p_sales.model_dump())
-#     print(ProductSales.schema())
+if __name__ == "__main__":
+    p_sales = ProductSales(
+        product_id="23", quantity=5, price=5.0, timestamp=datetime.now()
+    )
+
+    print(p_sales.model_dump())
+    print(ProductSales.schema())

@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABC
 from pyspark.sql import SparkSession, DataFrame
-import loguru
+from loguru import logger
 
 
 class Writer(ABC):
@@ -12,7 +12,7 @@ class Writer(ABC):
         """
         Print the schema of the DataFrame.
         """
-        loguru.logger.info("DataFrame Schema:")
+        logger.info("DataFrame Schema:")
         df.printSchema()
 
 
@@ -21,9 +21,9 @@ class ConsoleWriter(Writer):
         """
         Write DataFrame to console.
         """
-        loguru.logger.info(f"the type is {type(df)}")
+        logger.info(f"the type is {type(df)}")
 
-        loguru.logger.info("Writing DataFrame to console")
+        logger.info("Writing DataFrame to console")
         query = df.writeStream.format("console").outputMode("append").start()
         query.awaitTermination()
 
@@ -40,12 +40,15 @@ class IcebergWriter(Writer):
 
         self.print_df_schema(df)
 
-        loguru.logger.info(
+        logger.info(
             f"Iceberg table is {namespace}.{namespace}.{iceberg_table} with processing time {processing_time}"
         )
 
+        # logger.info(f"Total data received is {df.count()}Writing DataFrame to Iceberg table {namespace}.{iceberg_table}")
+
         query = (
             df.writeStream.format("iceberg")
+            # .foreachBatch(lambda x,y:x.count())
             .outputMode("append")
             .trigger(processingTime=f"{processing_time}")
             .toTable(f"{namespace}.{iceberg_table}")

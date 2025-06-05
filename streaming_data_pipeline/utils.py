@@ -2,6 +2,8 @@ from pyspark import SparkConf
 from pyspark.sql import SparkSession
 
 
+
+
 def get_spark_conf(**kwargs) -> SparkConf:
     nessie_server_uri = kwargs["nessie_server_uri"]
     warehouse_bucket = kwargs["warehouse_bucket"]
@@ -18,7 +20,6 @@ def get_spark_conf(**kwargs) -> SparkConf:
             "spark.jars.packages",
             "org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.5.2,org.projectnessie.nessie-integrations:nessie-spark-extensions-3.5_2.12:0.91.3,org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.2",
         )
-        # SQL Extensions
         .set(
             "spark.sql.extensions",
             "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions,org.projectnessie.spark.extensions.NessieSparkSessionExtensions",

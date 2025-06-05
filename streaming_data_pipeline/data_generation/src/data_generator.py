@@ -1,28 +1,29 @@
 import asyncio
+import random
 from abc import ABC, abstractmethod
 from pydantic import BaseModel
 from streaming_data_pipeline.data_generation.src.random_data_generator import (
-    data_generator,
+    random_data_generator,
 )
-from streaming_data_pipeline.data_generation.src.sink.writer_factory import Context
+from loguru import logger
 
 
 class DataGenerator(ABC):
-    def __init__(self, model_schema: dict, avro_schema: dict):
-        self.model_schema = model_schema
-        self.avro_schema = avro_schema
+    """
+    An abstract base class for data generators.
+    currently supports streaming and late arriving data generation.
+    """
+
+    def __init__(self, data_model: type[BaseModel]):
+        self.data_model = data_model
+        self.generated_data: list[BaseModel] = list()
 
     @abstractmethod
     async def generate_data(
-        self,
-        num_records: int,
-        model: type[BaseModel],
-        writer_context: Context,
-        **kwargs,
-    ):
-        """
-        Generate data based on the schema.
-        """
+            self,
+            num_records: int,
+            **kwargs,
+    ) -> list[BaseModel]:
         pass
 
 
@@ -32,23 +33,17 @@ class StreamingDataGenerator(DataGenerator):
     """
 
     async def generate_data(
-        self,
-        num_records: int,
-        model: type[BaseModel],
-        writer_context: Context,
-        **kwargs,
-    ):
-        """
-        Generate data based on the schema.
-        """
-        records = await data_generator(self.model_schema, num_records, sleep_seconds=0)
+            self,
+            num_records: int,
+            **kwargs,
+    ) -> list[BaseModel]:
+        records = await random_data_generator(self.data_model.model_schema(), num_records,
+                                              sleep_seconds=kwargs.get("sleep_seconds", 0))
+
         for record in records:
             # Convert the dictionary to a Pydantic model instance
-            # data.append(model(**record).model_dump())
-            writer = writer_context.write_data()
-            writer(
-                data=record, avro_schema=self.avro_schema, file_path=kwargs["file_path"]
-            )
+            self.generated_data.append(self.data_model(**record))
+        return self.generated_data
 
 
 class LateArrivingDataGenerator(DataGenerator):
@@ -57,40 +52,30 @@ class LateArrivingDataGenerator(DataGenerator):
     """
 
     def __init__(
-        self,
-        model_schema: dict,
-        avro_schema: dict,
-        delay_by_day: int = 0,
-        delay_by_hour: int = 0,
+            self,
+            data_model: type[BaseModel],
     ):
-        super().__init__(model_schema, avro_schema)
-        self.delay_by_day = delay_by_day
-        self.delay_by_hour = delay_by_hour
+        super().__init__(data_model=data_model)
 
     async def generate_data(
-        self,
-        num_records: int,
-        model: type[BaseModel],
-        writer_context: Context,
-        **kwargs,
-    ):
-        """
-        Generate data based on the schema.
-        """
-        records = await data_generator(
-            self.model_schema,
+            self,
+            num_records: int,
+            **kwargs,
+    ) -> list[BaseModel]:
+        records = await random_data_generator(
+            self.data_model.model_schema(),
             num_records,
-            sleep_seconds=0,
-            data_delay_by_day=self.delay_by_day,
-            data_delay_by_hour=self.delay_by_hour,
+            sleep_seconds=kwargs.get("sleep_seconds", 0),
+            data_delay_by_day=kwargs.get("data_delay_by_day", 0),
+            data_delay_by_hour=kwargs.get("data_delay_by_hour", 0),
+            data_delay_by_mins=kwargs.get("data_delay_by_mins", 0),
+            data_delay_by_secs=kwargs.get("data_delay_by_secs", 0),
         )
+
         for record in records:
             # Convert the dictionary to a Pydantic model instance
-            # data.append(model(**record).model_dump())
-            writer = writer_context.write_data()
-            writer(
-                data=record, avro_schema=self.avro_schema, file_path=kwargs["file_path"]
-            )
+            self.generated_data.append(self.data_model(**record))
+        return self.generated_data
 
 
 class DataGeneratorFactory:
@@ -100,15 +85,71 @@ class DataGeneratorFactory:
 
     @staticmethod
     def data_generator(
-        generator_type: str, model_schema: dict, avro_schema: dict
+            generator_type: str, data_model: type[BaseModel],
     ) -> DataGenerator:
         if generator_type == "streaming":
             return StreamingDataGenerator(
-                model_schema=model_schema, avro_schema=avro_schema
+                data_model=data_model
             )
         elif generator_type == "late_arriving":
             return LateArrivingDataGenerator(
-                model_schema=model_schema, avro_schema=avro_schema
+                data_model=data_model,
+
             )
         else:
             raise ValueError(f"Unknown generator type: {generator_type}")
+
+
+from random import randint
+
+
+async def stream_data_generator(generator):
+    print(f"Pushing  data generation event loop of stream_data_generator")
+    data: list[BaseModel] = await generator.generate_data(num_records=randint(1, 200), sleep_seconds=randint(1, 10))
+    return data
+
+
+async def late_data_generator_by_day(generator):
+    print(f"Pushing  of data generation event loop of main_late_data_generator_by_day")
+    data: list[BaseModel] = await generator.generate_data(num_records=randint(1, 200), sleep_seconds=randint(1, 10),
+                                                          data_delay_by_day=randint(1, 2))
+    return data
+
+
+async def late_data_generator_by_hour(generator):
+    print(f"Pushing  of data generation event loop of main_late_data_generator_by_hour")
+    data: list[BaseModel] = await generator.generate_data(num_records=randint(1, 200), sleep_seconds=randint(1, 10),
+                                                          data_delay_by_hour=randint(1, 5))
+    return data
+
+
+async def late_data_generator_by_minutes(generator):
+    print(f"Pushing of data generation event loop of main_late_data_generator_by_minutes")
+    data: list[BaseModel] = await generator.generate_data(num_records=randint(1, 200), sleep_seconds=randint(1, 10),
+                                                          data_delay_by_mins=randint(1, 1000))
+    return data
+
+
+async def late_data_generator_by_seconds(generator):
+    print(f"Pushing of data generation event loop of main_late_data_generator_by_seconds")
+    data: list[BaseModel] = await generator.generate_data(num_records=randint(1, 200), sleep_seconds=randint(1, 10),
+                                                          data_delay_by_secs=randint(1, 4555))
+    return data
+
+
+# if __name__ == '__main__':
+#     from streaming_data_pipeline.settings import DATA_GENERATION_MODEL, DATA_GENERATOR_TYPE, \
+#         MODEL_MAP
+#
+#     generator = DataGeneratorFactory.data_generator(DATA_GENERATOR_TYPE,
+#                                                     data_model=MODEL_MAP[DATA_GENERATION_MODEL]['model'])
+#
+#     functions = [stream_data_generator,
+#                  main_late_data_generator_by_day,
+#                  main_late_data_generator_by_hour,
+#                  main_late_data_generator_by_minutes,
+#                  main_late_data_generator_by_seconds]
+#
+#     for _ in range(10):
+#         data = asyncio.run(random.choice(functions)(generator))
+#         print(data)
