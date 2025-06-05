@@ -4,7 +4,6 @@ import loguru
 from streaming_data_pipeline.schemas.product_sales import product_sales_avro_schema
 from streaming_data_pipeline.data_generation.src.sink.writer import Writer
 from typing import Iterable
-from abc import abstractmethod
 from confluent_kafka import Producer
 import fastavro
 import json
@@ -105,7 +104,7 @@ if __name__ == "__main__":
     writer = KafkaWriterFactory.get_writer(
         serialization_format="json",
         topic="mentor_cruise",
-        brokers="localhost:9092",
+        bootstrap_servers="localhost:9092",
         schema=product_sales_avro_schema,
     )
     for _ in range(10):
