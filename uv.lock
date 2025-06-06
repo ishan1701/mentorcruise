@@ -156,15 +156,6 @@ wheels = [
 ]
 
 [[package]]
-name = "dataclasses"
-version = "0.8"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/1f/12/7919c5d8b9c497f9180db15ea8ead6499812ea8264a6ae18766d93c59fe5/dataclasses-0.8.tar.gz", hash = "sha256:8479067f342acf957dc82ec415d355ab5edb7e7646b90dc6e2fd1d96ad084c97", size = 36581 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/fe/ca/75fac5856ab5cfa51bbbcefa250182e50441074fdc3f803f6e76451fab43/dataclasses-0.8-py3-none-any.whl", hash = "sha256:0201d89fa866f68c8ebd9d08ee6ff50c0b255f8ec63a71c16fda7af82bb887bf", size = 19041 },
-]
-
-[[package]]
 name = "fastavro"
 version = "1.11.1"
 source = { registry = "https://pypi.org/simple" }
@@ -307,11 +298,11 @@ dependencies = [
     { name = "black" },
     { name = "click" },
     { name = "confluent-kafka" },
-    { name = "dataclasses" },
     { name = "fastavro" },
     { name = "hatchling" },
     { name = "loguru" },
     { name = "mypy" },
+    { name = "pip" },
     { name = "pyarrow" },
     { name = "pydantic" },
     { name = "pyiceberg", extra = ["glue", "sql-sqlite"] },
@@ -325,11 +316,11 @@ requires-dist = [
     { name = "black", specifier = ">=25.1.0" },
     { name = "click", specifier = ">=8.2.0" },
     { name = "confluent-kafka", specifier = ">=2.10.0" },
-    { name = "dataclasses", specifier = ">=0.8" },
     { name = "fastavro", specifier = ">=1.11.1" },
     { name = "hatchling" },
     { name = "loguru", specifier = ">=0.7.3" },
     { name = "mypy", specifier = ">=1.15.0" },
+    { name = "pip", specifier = ">=25.1.1" },
     { name = "pyarrow", specifier = ">=20.0.0" },
     { name = "pydantic", specifier = ">=2.11.4" },
     { name = "pyiceberg", extras = ["glue", "rest", "sql-sqlite"], specifier = ">=0.9.1" },
@@ -438,6 +429,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/ca/bc/f35b8446f4531a7cb215605d100cd88b7ac6f44ab3fc94870c120ab3adbf/pathspec-0.12.1.tar.gz", hash = "sha256:a482d51503a1ab33b1c67a6c3813a26953dbdc71c31dacaef9a838c4e29f5712", size = 51043 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/cc/20/ff623b09d963f88bfde16306a54e12ee5ea43e9b597108672ff3a408aad6/pathspec-0.12.1-py3-none-any.whl", hash = "sha256:a0d503e138a4c123b27490a4f7beda6a01c6f288df0e4a8b79c7eb0dc7b4cc08", size = 31191 },
+]
+
+[[package]]
+name = "pip"
+version = "25.1.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/59/de/241caa0ca606f2ec5fe0c1f4261b0465df78d786a38da693864a116c37f4/pip-25.1.1.tar.gz", hash = "sha256:3de45d411d308d5054c2168185d8da7f9a2cd753dbac8acbfa88a8909ecd9077", size = 1940155 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/29/a2/d40fb2460e883eca5199c62cfc2463fd261f760556ae6290f88488c362c0/pip-25.1.1-py3-none-any.whl", hash = "sha256:2913a38a2abf4ea6b64ab507bd9e967f3b53dc1ede74b01b0931e1ce548751af", size = 1825227 },
 ]
 
 [[package]]

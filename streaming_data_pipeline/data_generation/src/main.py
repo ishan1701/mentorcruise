@@ -4,14 +4,9 @@ from streaming_data_pipeline.settings import (
     DATA_GENERATOR_WRITER as WRITER_TYPE,
     DATA_GENERATION_MODEL,
     DATA_GENERATOR_TYPE,
+    MODEL_MAP
 )
 import asyncio
-from streaming_data_pipeline.settings import (
-    DATA_GENERATION_MODEL,
-    DATA_GENERATOR_TYPE,
-    MODEL_MAP,
-    DATA_GENERATOR_WRITER,
-)
 
 from streaming_data_pipeline.data_generation.src.data_generator import (
     DataGeneratorFactory,
@@ -53,11 +48,11 @@ def main():
     # create a sink context
 
     writer = WriterFactory.get_writer(
-        writer_type=DATA_GENERATOR_WRITER, **writer_config
+        writer_type=WRITER_TYPE, **writer_config
     )
     context = Context(writer=writer)
 
-    for _ in range(10):
+    while True:
         data = asyncio.run(random.choice(functions)(generator))
         for record in data:
             # serializing the pydantic model before pushing to kafka

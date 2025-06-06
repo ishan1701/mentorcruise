@@ -1,7 +1,7 @@
 version: '3'
 
 vars:
-  WAREHOUSE_DIR: "iceberg/warehouse"
+  WAREHOUSE_DIR: "~/tmp/iceberg/warehouse"
   SPARK_VERSION: "3.5.5"
   KAFKA_INSTALLATION_DIR: "~/kafka-dir"
   KAFKA_TOPIC: "mentor_cruise"
@@ -17,12 +17,15 @@ tasks:
     desc: Setup Python virtual environment
     cmds:
       - uv venv .venv
-      - source .venv/bin/activate && uv pip install -r pyproject.toml
 
-  build-python-modules:
+  install-python-dependencies:
+    cmds:
+      - bash -c "source .venv/bin/activate && uv pip install -r pyproject.toml"
+
+  build-project-modules:
     desc: Build Python modules
     cmds:
-      - source .venv/bin/activate && python3.12 -m pip install -e .
+      - bash -c "source .venv/bin/activate && python3.12 -m pip install -e ."
 
   setup-kafka:
     desc: Setup Kafka environment
@@ -37,14 +40,17 @@ tasks:
     cmds:
       - docker run --rm -d --name nessie -p 19120:19120 ghcr.io/projectnessie/nessie:latest
 
-  start-kafka:
+  start-kafka-first-time:
     desc: Start Kafka service
     cmds:
-      - cd {{.KAFKA_INSTALLATION_DIR}}/kafka && KAFKA_CLUSTER_ID="$(bin/kafka-storage.sh random-uuid)"
-      - cd {{.KAFKA_INSTALLATION_DIR}}/kafka && bin/kafka-storage.sh format --standalone -t $KAFKA_CLUSTER_ID -c config/server.properties
-      - cd {{.KAFKA_INSTALLATION_DIR}}/kafka && bin/kafka-server-start.sh config/server.properties
+      - |
+        cd {{.KAFKA_INSTALLATION_DIR}}/kafka
+        export KAFKA_CLUSTER_ID=$(bin/kafka-storage.sh random-uuid)
+        rm -rf /tmp/kraft-combined-logs
+        bin/kafka-storage.sh format --standalone -t $KAFKA_CLUSTER_ID -c config/server.properties
+        bin/kafka-server-start.sh config/server.properties
 
-  creare-kafka-topic:
+  create-kafka-topic:
     desc: Create Kafka topic
     cmds:
       - cd {{.KAFKA_INSTALLATION_DIR}}/kafka && bin/kafka-topics.sh --create --topic {{.KAFKA_TOPIC}} --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
@@ -59,18 +65,22 @@ tasks:
     cmds:
       - cd {{.KAFKA_INSTALLATION_DIR}}/kafka && bin/kafka-server-stop.sh
 
+  start-kafka:
+    desc: Start Kafka service
+    cmds:
+      - cd {{.KAFKA_INSTALLATION_DIR}}/kafka && bin/kafka-server-start.sh config/server.properties
 
   run-pyspark-data-processing:
     desc: Run data generation module
     cmds:
-      - source .venv/bin/activate && python -m streaming_data_pipeline.data_processing.src.main
+      - bash -c "source .venv/bin/activate && python -m streaming_data_pipeline.data_processing.src.main"
 
   run-random-data-generation:
     desc: Run data generation module
     cmds:
-      - source .venv/bin/activate && python -m streaming_data_pipeline.data_generation.src.main
+      - bash -c "source .venv/bin/activate && python -m streaming_data_pipeline.data_generation.src.main"
 
   run-pyspark-batch-job:
     desc: Run PySpark batch job
     cmds:
-      - source .venv/bin/activate && python -m streaming_data_pipeline.batch_data_pipeline.src.main
+      - bash -c "source .venv/bin/activate && python -m batch_data_pipeline.src.main"

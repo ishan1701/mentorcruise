@@ -1,4 +1,4 @@
-from batch_data_pipeline.utils import get_spark_conf, get_spark_session
+from batch_data_pipeline.src.utils import get_spark_conf, get_spark_session
 import os
 from loguru import logger
 
