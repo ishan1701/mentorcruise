@@ -48,7 +48,6 @@ class IcebergWriter(Writer):
 
         query = (
             df.writeStream.format("iceberg")
-            # .foreachBatch(lambda x,y:x.count())
             .outputMode("append")
             .trigger(processingTime=f"{processing_time}")
             .toTable(f"{namespace}.{iceberg_table}")

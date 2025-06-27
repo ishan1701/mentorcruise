@@ -68,7 +68,12 @@ tasks:
   start-kafka:
     desc: Start Kafka service
     cmds:
-      - cd {{.KAFKA_INSTALLATION_DIR}}/kafka && bin/kafka-server-start.sh config/server.properties
+      - |
+        cd {{.KAFKA_INSTALLATION_DIR}}/kafka
+
+#        export KAFKA_CLUSTER_ID=$(bin/kafka-storage.sh random-uuid)
+#        bin/kafka-storage.sh format --standalone -t $KAFKA_CLUSTER_ID -c config/server.properties
+        bin/kafka-server-start.sh config/server.properties
 
   run-pyspark-data-processing:
     desc: Run data generation module

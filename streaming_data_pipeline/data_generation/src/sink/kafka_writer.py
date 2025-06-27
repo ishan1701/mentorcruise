@@ -35,10 +35,11 @@ class KafkaAvroWriter(KafkaWriter):
         )
 
     def _serialize(self, data: dict) -> bytes:
+
         import io
 
         with io.BytesIO() as buffer:
-            fastavro.writer(buffer, self.schema, [data])
+            fastavro.writer(buffer, self.schema, data)
             return buffer.getvalue()
 
     def write(self, data: dict | Iterable[dict], **kwargs) -> None:
@@ -48,9 +49,9 @@ class KafkaAvroWriter(KafkaWriter):
             data = [data]
         for record in data:
             serialized_record = self._serialize(record)
-            self.producer.produce(self.kafka_topic, value=serialized_record)
-            ## think on how to handle flush
-        self.producer.flush()
+        #     self.producer.produce(self.kafka_topic, value=serialized_record)
+        #     ## think on how to handle flush
+        # self.producer.flush()
 
 
 class KafkaJsonWriter(KafkaWriter):
@@ -104,7 +105,7 @@ if __name__ == "__main__":
         product_id="sample", quantity=10, price=100.0, timestamp=datetime.now()
     )
     writer = KafkaWriterFactory.get_writer(
-        serialization_format="json",
+        serialization_format="avro",
         topic="mentor_cruise",
         bootstrap_servers="localhost:9092",
         schema=product_sales_avro_schema,

@@ -1,4 +1,4 @@
-from serializer import Serializer, JsonSerializer, AvroSerializer
+from serializer import Serializer, MJsonSerializer as JsonSerializer, MAvroSerializer
 from typing import Callable
 
 
@@ -8,7 +8,7 @@ class SerializerFactory:
         if serializer_type == "json":
             return JsonSerializer.serialize
         elif serializer_type == "avro":
-            return AvroSerializer.serialize
+            return MAvroSerializer.serialize
         else:
             raise ValueError(f"Unknown serializer type: {serializer_type}")
 

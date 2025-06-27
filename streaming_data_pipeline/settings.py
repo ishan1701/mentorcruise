@@ -32,3 +32,7 @@ MODEL_MAP = {
         "create_sql": product_sales_create_sql_iceberg_table,
     }
 }
+
+
+CONFLUENT_SCHEMA_REGISTRY_URL = "http://localhost:8081"
+
