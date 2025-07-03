@@ -1,5 +1,7 @@
 from confluent_kafka.schema_registry import SchemaRegistryClient, Schema
 from loguru import logger
+from schemas.product_sales import product_sales_avro_schema
+from schemas.order_date import order_date_avro_schema
 
 
 def schema_registry_client(conf: dict) -> SchemaRegistryClient:
@@ -17,15 +19,13 @@ def list_schemas(client: SchemaRegistryClient) -> list[str]:
     return client.get_subjects()
 
 
-def register_schema(client: SchemaRegistryClient, schema: dict, subject: str) -> int :
+def register_schema(client: SchemaRegistryClient, schema: dict, subject: str) -> int:
     """
     Register a new schema in the schema registry.
     """
     import json
     if client is None:
         raise ValueError("Schema Registry client is not initialized.")
-
-
 
     avro_schema = Schema(schema_str=json.dumps(schema), schema_type="AVRO")
 
@@ -36,6 +36,7 @@ def register_schema(client: SchemaRegistryClient, schema: dict, subject: str) ->
 
     except Exception as ex:
         logger.error(f"Failed to register schema for {subject}: {ex}")
+
 
 def delete_schema(client: SchemaRegistryClient, subject: str) -> None:
     """
@@ -52,7 +53,7 @@ def delete_schema(client: SchemaRegistryClient, subject: str) -> None:
         logger.error(f"Failed to delete schema for {subject}: {ex}")
 
 
-def set_compatibility(client: SchemaRegistryClient, subject_name: str, level: str='backward') -> str:
+def set_compatibility(client: SchemaRegistryClient, subject_name: str, level: str = 'backward') -> str:
     """
     Set the compatibility level for a schema subject.
     """
@@ -67,34 +68,27 @@ def set_compatibility(client: SchemaRegistryClient, subject_name: str, level: st
     except Exception as ex:
         logger.error(f"Failed to set compatibility for {subject_name}: {ex}")
 
-#
-# # testing
-if __name__ == '__main__':
+
+def main(model_subject: str, register_new_schema: bool = False) -> None:
     client = schema_registry_client({'url': 'http://localhost:8081'})
 
-    print(client.get_versions(subject_name='product_sales'))
+    schema: dict = dict()
+    if register_new_schema:
+        if model_subject == 'product_sales':
+            schema = product_sales_avro_schema
+        elif model_subject == 'order_date':
+            schema = order_date_avro_schema
+        else:
+            raise ValueError(f"Unknown model subject: {model_subject}")
 
-    versions= client.get_versions(subject_name='product_sales')
-    for version in versions:
-        print(client.get_version(subject_name='product_sales', version=version).schema.schema_str)
-    #
-    # set_compatibility(client, subject_name='product_sales', level='forward')
-    #
-    # schema = {
-    #     "type": "record",
-    #     "name": "product_sales",
-    #     "fields": [
-    #         {"name": "product_id", "type": "string"},
-    #         {"name": "quantity", "type": "int"},
-    #         {"name": "price", "type": "float"},
-    #         {"name": "timestamp", "type": "string"},
-    #     ]
-    # }
-    #
-    #
-    # schema_id= register_schema(client, schema, "product_sales")
-    #
-    # logger.info(f"Registered schema for {schema_id}")
-    # print(client.get_schema(schema_id))
-    #
-    # print(list_schemas(client))
+    schema_id = register_schema(client, schema, model_subject)
+    logger.info(f"Registered schema for {model_subject} with ID {schema_id}")
+
+    logger.info(f"the latest version is {client.get_latest_version(subject_name=model_subject)}")
+
+
+
+# # testing
+if __name__ == '__main__':
+    model_subject = "product_sales"
+    main(model_subject=model_subject, register_new_schema=True)

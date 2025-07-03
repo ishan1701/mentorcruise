@@ -6,6 +6,7 @@ from streaming_data_pipeline.data_generation.src.random_data_generator import (
     random_data_generator,
 )
 from loguru import logger
+from random import randint
 
 
 class DataGenerator(ABC):
@@ -101,8 +102,6 @@ class DataGeneratorFactory:
             raise ValueError(f"Unknown generator type: {generator_type}")
 
 
-from random import randint
-
 
 async def stream_data_generator(generator):
     print(f"Pushing  data generation event loop of stream_data_generator")
@@ -155,7 +154,7 @@ async def late_data_generator_by_seconds(generator):
     )
     return data
 
-
+#
 # if __name__ == '__main__':
 #     from streaming_data_pipeline.settings import DATA_GENERATION_MODEL, DATA_GENERATOR_TYPE, \
 #         MODEL_MAP
@@ -164,10 +163,10 @@ async def late_data_generator_by_seconds(generator):
 #                                                     data_model=MODEL_MAP[DATA_GENERATION_MODEL]['model'])
 #
 #     functions = [stream_data_generator,
-#                  main_late_data_generator_by_day,
-#                  main_late_data_generator_by_hour,
-#                  main_late_data_generator_by_minutes,
-#                  main_late_data_generator_by_seconds]
+#                  late_data_generator_by_day,
+#                  late_data_generator_by_hour,
+#                  late_data_generator_by_minutes,
+#                  late_data_generator_by_seconds]
 #
 #     for _ in range(10):
 #         data = asyncio.run(random.choice(functions)(generator))

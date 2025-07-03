@@ -1,7 +1,7 @@
 from streaming_data_pipeline.data_generation.src.models.product_sales import (
     ProductSales,
 )
-from streaming_data_pipeline.schemas.product_sales import (
+from schemas.product_sales import (
     product_sales_schema_iceberg,
     product_sales_avro_schema,
     product_sales_schema_spark,

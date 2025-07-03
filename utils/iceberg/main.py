@@ -5,7 +5,7 @@ nessie_server_uri = "http://localhost:19120/api/v2"
 warehouse_bucket = "/tmp/warehouse"
 namespace = "nessie"
 
-from streaming_data_pipeline.data_operations.iceberg import (
+from iceberg import (
     drop_iceberg_table_with_pyspark,
 )
 

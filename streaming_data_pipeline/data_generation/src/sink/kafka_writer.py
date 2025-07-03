@@ -1,14 +1,14 @@
 # TO DO. Add the derived class for Kafka writer
 import loguru
 
-from streaming_data_pipeline.schemas.product_sales import product_sales_avro_schema
-from streaming_data_pipeline.data_generation.src.sink.writer import Writer
+from schemas.product_sales import product_sales_avro_schema
+from writer import Writer
 from typing import Iterable
 from confluent_kafka import Producer
 import fastavro
 import json
 from abc import ABC
-
+from confluent_kafka.schema_registry.json_schema import JSONSerializer
 
 class KafkaWriter(Writer, ABC):
     writer_type = "kafka"
@@ -57,7 +57,7 @@ class KafkaAvroWriter(KafkaWriter):
 class KafkaJsonWriter(KafkaWriter):
     serialization_format = "json"
 
-    def __init__(self, **kwargs):
+    def __init__(self, schema_registry_client: str,**kwargs):
         # lets define the pydantic models
         super().__init__(
             kafka_topic=kwargs["topic"],
